@@ -1,0 +1,10 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Invalid Entry
+{% endblock %}
+    
+{% block body %}
+    <h1>ERROR:</h1>
+    <p>Entry of title: "{{ title }}" was not found in the database, please try again</p>
+{% endblock %}
