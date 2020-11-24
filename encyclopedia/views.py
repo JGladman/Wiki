@@ -9,6 +9,15 @@ class SearchForm(forms.Form):
     search = forms.CharField(label="",
                             widget=forms.TextInput(attrs={'class':'search', 'placeholder':'Search Encyclopedia'}))
 
+class TitleForm(forms.Form):
+    title = forms.CharField(label="",
+                            widget=forms.TextInput(attrs={'placeholder':'Title of New Page'}))
+
+class ContentForm(forms.Form):
+    content = forms.CharField(label="",widget=forms.Textarea(attrs={
+                                                                    'placeholder':'Content of New Page',
+                                                                    'style': 'height: 40em;'}))
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
@@ -55,4 +64,24 @@ def search(request):
                 "form": SearchForm()
             })
 
+def create(request):
+    return render(request, "encyclopedia/create_page.html", {
+        "form": SearchForm(),
+        "title_form": TitleForm(),
+        "content_form": ContentForm()
+    })
 
+def submit_creation(request):
+    title_form = TitleForm(request.POST)
+    content_form = ContentForm(request.POST)
+
+    if title_form.is_valid() and content_form.is_valid():
+        title = title_form.cleaned_data["title"]
+        entries = util.list_entries()
+        if title in entries:
+            return render(request, "encyclopedia/duplicate.html", {
+                        "form": SearchForm(),
+                        "title": title})
+        else:
+            util.save_entry(title, content_form.cleaned_data["content"])
+            return HttpResponseRedirect(reverse("entry", kwargs={"title":title}))

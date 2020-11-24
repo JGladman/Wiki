@@ -1,0 +1,10 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Duplicate Entry
+{% endblock %}
+    
+{% block body %}
+    <h1>ERROR:</h1>
+    <p>Entry of title: "{{ title }}" already exists in the database, please try again</p>
+{% endblock %}

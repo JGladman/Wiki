@@ -1,8 +1,10 @@
 import re
+import markdown2
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
+from markdown2 import Markdown
 
 def list_entries():
     """
@@ -20,9 +22,13 @@ def save_entry(title, content):
     it is replaced.
     """
     filename = f"entries/{title}.md"
-    if default_storage.exists(filename):
-        default_storage.delete(filename)
-    default_storage.save(filename, ContentFile(content))
+    html_filename = f"encyclopedia/templates/entries/{title}.html"
+    if not default_storage.exists(filename):
+        default_storage.save(filename, ContentFile(content))
+        markdowner = Markdown()
+        html_content = markdowner.convert(content)
+        html = "{% extends 'encyclopedia/entry.html' %}\n\n{% block entry_title %}\n" + title + "\n{% endblock %}\n\n{% block entry_body %}" + html_content + "\n{% endblock %}"
+        default_storage.save(html_filename, ContentFile(html))
 
 
 def get_entry(title):
