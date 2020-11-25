@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 from . import util
+from random import randint
 
 class SearchForm(forms.Form):
     search = forms.CharField(label="",
@@ -105,7 +106,8 @@ def submit_edit(request, title):
     if content_form.is_valid():
         util.save_entry(title, content_form.cleaned_data["content"])
         return HttpResponseRedirect(reverse("entry", kwargs={"title":title}))
-    else:
-        return render(request, "encyclopedia/duplicate.html", {
-                        "form": SearchForm(),
-                        "title": title})
+
+def random_page(request):
+    entries = util.list_entries()
+    rand = randint(0, len(entries) - 1)
+    return HttpResponseRedirect(reverse("entry", kwargs={"title":entries[rand]}))
