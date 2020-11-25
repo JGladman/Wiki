@@ -18,6 +18,12 @@ class ContentForm(forms.Form):
                                                                     'placeholder':'Content of New Page',
                                                                     'style': 'height: 40em;'}))
 
+class EditForm(forms.Form):
+    content = forms.CharField(label="",widget=forms.Textarea(attrs={
+                                                                    'placeholder':'Content of Editted Page',
+                                                                    'style': 'height: 40em;'}))
+
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries(),
@@ -85,3 +91,21 @@ def submit_creation(request):
         else:
             util.save_entry(title, content_form.cleaned_data["content"])
             return HttpResponseRedirect(reverse("entry", kwargs={"title":title}))
+
+def edit(request, title):
+    return render(request, "encyclopedia/edit.html", {
+        "form": SearchForm(),
+        "title": title,
+        "content_form": EditForm(),
+    })
+
+def submit_edit(request, title):
+    content_form = EditForm(request.POST)
+    
+    if content_form.is_valid():
+        util.save_entry(title, content_form.cleaned_data["content"])
+        return HttpResponseRedirect(reverse("entry", kwargs={"title":title}))
+    else:
+        return render(request, "encyclopedia/duplicate.html", {
+                        "form": SearchForm(),
+                        "title": title})
